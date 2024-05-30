@@ -34,6 +34,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-9
               ccompiler: gcc-9
+              cxxcompiler: g++-9
               rocm_version: 5.7.3
               shell: bash
               build_type: coverage
@@ -42,6 +43,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-9
               ccompiler: gcc-9
+              cxxcompiler: g++-9
               rocm_version: 5.7.3
               shell: bash
               build_type: debug
@@ -50,6 +52,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-10
               ccompiler: gcc-10
+              cxxcompiler: g++-10
               rocm_version: 5.7.3
               shell: bash
               build_type: debug
@@ -58,6 +61,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-11
               ccompiler: gcc-11
+              cxxcompiler: g++-11
               rocm_version: 5.7.3
               shell: bash
               build_type: debug
@@ -66,6 +70,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-12
               ccompiler: gcc-12
+              cxxcompiler: g++-12
               rocm_version: 5.7.3
               shell: bash
               build_type: debug
@@ -92,7 +97,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          FC=${{ matrix.fcompiler }} CC=${{ matrix.ccompiler }} cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  ../
+          FC=${{ matrix.fcompiler }} CC=${{ matrix.ccompiler }} CXX=${{ matrix.cxxcompiler }} cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}  ../
           make VERBOSE=1
 
       - name: Initialize coverage counters
