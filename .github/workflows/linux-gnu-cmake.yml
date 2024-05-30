@@ -34,6 +34,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-9
               ccompiler: gcc-9
+              rocm_version: 5.7.3
               shell: bash
               build_type: coverage
               memcheck: true
@@ -41,6 +42,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-9
               ccompiler: gcc-9
+              rocm_version: 5.7.3
               shell: bash
               build_type: debug
               memcheck: false
@@ -48,6 +50,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-10
               ccompiler: gcc-10
+              rocm_version: 5.7.3
               shell: bash
               build_type: debug
               memcheck: false
@@ -55,6 +58,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-11
               ccompiler: gcc-11
+              rocm_version: 5.7.3
               shell: bash
               build_type: debug
               memcheck: false
@@ -62,6 +66,7 @@ jobs:
             - os: ubuntu-22.04
               fcompiler: gfortran-12
               ccompiler: gcc-12
+              rocm_version: 5.7.3
               shell: bash
               build_type: debug
               memcheck: false
@@ -73,7 +78,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+      - name: rocm-setup
+        uses: neoblizz/rocm-setup@v0.1.0-beta
+        with:
+          rocm: ${{ matrix.rocm_version }}
 
       - name: Show version information
         run: |
