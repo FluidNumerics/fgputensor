@@ -1,20 +1,14 @@
 cmake_minimum_required(VERSION 3.21) # HIP language support requires 3.21 or gretater
 cmake_policy(VERSION 3.21...3.27)
 
-if(NOT DEFINED ROCM_PATH)
-    if(NOT DEFINED ENV{ROCM_PATH})
-        set(ROCM_PATH "/opt/rocm/" CACHE PATH "Path to which ROCm has been installed")
-    else()
-        set(ROCM_PATH $ENV{ROCM_PATH} CACHE PATH "Path to which ROCm has been installed")
-    endif()
-endif()
+
 set( CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -fPIE")
 
 # C Language is needed in order to verify Fortran compiler is C-interoperable
 # CXX language is needed to properly find "hip" package
 project(fgputensor VERSION 1.0.0
 	DESCRIPTION "FGPUTensor"
-	LANGUAGES Fortran HIP C CXX)
+	LANGUAGES Fortran C CXX)
 
 # Fortran compiler requirements
 INCLUDE(FortranCInterface)
@@ -29,6 +23,13 @@ ENDIF(NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
 
 # ------ dependencies ------ #
 # HIP
+if(NOT DEFINED ROCM_PATH)
+    if(NOT DEFINED ENV{ROCM_PATH})
+        set(ROCM_PATH "/opt/rocm/" CACHE PATH "Path to which ROCm has been installed")
+    else()
+        set(ROCM_PATH $ENV{ROCM_PATH} CACHE PATH "Path to which ROCm has been installed")
+    endif()
+endif()
 find_package(hip)
 
 # -------------------------- #
