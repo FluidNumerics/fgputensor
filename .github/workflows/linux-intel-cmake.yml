@@ -104,7 +104,8 @@ jobs:
 
       - name: Run ctests
         run: |
-          make test
+          cd build
+          ctest
 
       - name: Create coverage report
         if: ${{ matrix.build_type == 'coverage' }}
