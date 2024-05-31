@@ -12,7 +12,9 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/include)
 
 # Shared library installation
 add_library(fgputensor SHARED ${fgputensor_FSRC})
-target_link_libraries(fgputensor PRIVATE hip::device)
+if( hip_FOUND )
+        target_link_libraries(fgputensor PRIVATE hip::device)
+endif()
 target_compile_options(fgputensor PRIVATE -fPIC)
 set_target_properties(fgputensor PROPERTIES LINKER_LANGUAGE Fortran)
 #set_target_properties(fgputensor PROPERTIES PUBLIC_HEADER ${fgputensor_HEADERS})
@@ -24,7 +26,9 @@ install(TARGETS fgputensor
 
 # Static library installation
 add_library(fgputensor-static STATIC ${fgputensor_FSRC})
-target_link_libraries(fgputensor-static PRIVATE hip::device)
+if( hip_FOUND )
+        target_link_libraries(fgputensor-static PRIVATE hip::device)
+endif()
 set_target_properties(fgputensor-static PROPERTIES LINKER_LANGUAGE Fortran)
 #set_target_properties(fgputensor-static PROPERTIES PUBLIC_HEADER ${fgputensor_HEADERS})
 
@@ -32,16 +36,6 @@ install(TARGETS fgputensor-static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         PUBLIC_HEADER DESTINATION include)
-
-# target_include_directories(fgputensor-static PRIVATE 
-#                         ${FEQPARSE_INCLUDE_DIRS}
-#                         ${HDF5_INCLUDE_DIRS}
-#                         ${MPI_Fortran_INCLUDE_DIRS}
-#                         ${HIPFORT_INCLUDE_DIRS})
-
-
-
-
-
+        
 # Install the .mod files under include/
 install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ DESTINATION include)

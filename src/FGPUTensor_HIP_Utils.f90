@@ -1,9 +1,12 @@
-module FGPUTensor_Utils
+module FGPUTensor_HIP_Utils
 
-  use FGPUTensor_HIP
-  use FGPUTensor_HIP_enums
+
   use iso_c_binding
   use iso_fortran_env
+#ifdef HIP
+  use FGPUTensor_HIP
+  use FGPUTensor_HIP_enums
+#endif
 
   implicit none
 
@@ -14,6 +17,7 @@ module FGPUTensor_Utils
   end enum
 
   logical,private :: acquired = .false.
+
 
 contains
 
@@ -26,23 +30,16 @@ contains
 
     ! The id of the device to use
     integer,intent(in) :: dev_id
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
+#ifdef HIP
     ! Number of compute devices
     integer :: ndevices
     integer(kind(hipSuccess)) :: hipError_t
-
-    ! ! Initialise resources the best practice way
-    ! if (.not. acquired) then
-    !     ! Initialise HIP
-    !     hipError_t = hipinit(0)
-    !     if( hipError_t /= 0 )then
-    !       exit_code = FGPUTensor_Utils_exit_hip_error_block + hipError_t
-    !       return
-    !     end if
-    !     ! We have now acquired HIP
-    !     acquired = .true.
-    ! end if
 
     ! Get the number of compute devices
     hipError_t = hipgetdevicecount(ndevices)
@@ -62,6 +59,7 @@ contains
       exit_code = FGPUTensor_Utils_exit_invalid_device_id
       return
     end if
+#endif
 
     exit_code = FGPUTensor_Utils_exit_no_error
 
@@ -72,6 +70,7 @@ contains
     logical :: avail
 ! Local
     integer(c_int) :: gpuCount
+#ifdef HIP
     integer(kind(hipSuccess)) :: err
 
     err = hipGetDeviceCount(gpuCount)
@@ -80,7 +79,10 @@ contains
     else
       avail = .false.
     end if
+#else
+    avail = .false.
+#endif
 
   end function GPUAvailable
 
-end module FGPUTensor_Utils
+end module FGPUTensor_HIP_Utils

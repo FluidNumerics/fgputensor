@@ -27,6 +27,12 @@ IF(NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
     MESSAGE(FATAL_ERROR "Fortran compiler does not support F90")
 ENDIF(NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
 
+# ------ dependencies ------ #
+# HIP
+find_package(hip)
+
+# -------------------------- #
+
 # Default Fortran compiler flags
 # Fortran compiler flags
 if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
@@ -35,12 +41,15 @@ if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
     set( CMAKE_Fortran_FLAGS_COVERAGE "${CMAKE_Fortran_FLAGS_DEBUG} --coverage")
     set( CMAKE_Fortran_FLAGS_PROFILE "-pg -O3")
     set( CMAKE_Fortran_FLAGS_RELEASE "-O3" )
-    set( CMAKE_C_FLAGS_COVERAGE "-g -O0 --coverage")
+    if( hip_FOUND )
+        set( CMAKE_Fortran_FLAGS "-DHIP" )
+        set( CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} -DHIP" )
+        set( CMAKE_Fortran_FLAGS_COVERAGE "${CMAKE_Fortran_FLAGS_COVERAGE} -DHIP")
+        set( CMAKE_Fortran_FLAGS_PROFILE "${CMAKE_Fortran_FLAGS_PROFILE} -DHIP")
+        set( CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS_RELEASE} -DHIP" )
+    endif()
 endif()
 
-# ------ dependencies ------ #
-# HIP
-find_package(hip REQUIRED)
 
 # ----- end dependencies ----- #
 

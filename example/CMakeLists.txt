@@ -11,9 +11,11 @@ function (add_fortran_examples)
     foreach (TFILE ${ARGN})
         string (REGEX REPLACE ".f90$" "" EXAMPLE_NAME ${TFILE})
         add_executable (${EXAMPLE_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/${TFILE})
-        target_link_libraries(${EXAMPLE_NAME}
-                    ${CMAKE_BINARY_DIR}/src/libfgputensor-static.a
-                    hip::device)
+        if( hip_FOUND )
+          target_link_libraries(${EXAMPLE_NAME} ${CMAKE_BINARY_DIR}/src/libfgputensor-static.a hip::device)
+        else()
+          target_link_libraries(${EXAMPLE_NAME} ${CMAKE_BINARY_DIR}/src/libfgputensor-static.a)
+        endif()
                            
         target_include_directories(${EXAMPLE_NAME} PRIVATE 
                         ${CMAKE_BINARY_DIR}/include)

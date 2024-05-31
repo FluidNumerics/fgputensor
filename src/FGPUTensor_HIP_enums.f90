@@ -30,7 +30,7 @@ module FGPUTensor_HIP_enums
   use iso_c_binding
 
   implicit none
-
+#ifdef HIP
   !> Derived TYPE that can be mapped directly to a CUDA/HIP C++ dim3.
   type,bind(c) :: dim3
     integer(c_int) :: x = 1,y = 1,z = 1
@@ -727,5 +727,6 @@ module FGPUTensor_HIP_enums
     enumerator :: HIP_LIBRARY_MINOR_VERSION
     enumerator :: HIP_LIBRARY_PATCH_LEVEL
   end enum
+#endif
 
 end module FGPUTensor_HIP_enums

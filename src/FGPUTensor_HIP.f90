@@ -31,6 +31,7 @@ module FGPUTensor_HIP
 
   implicit none
 
+#ifdef HIP
   interface hipGetDeviceCount
     function hipGetDeviceCount_(count) bind(c,name="hipGetDeviceCount")
       use iso_c_binding
@@ -97,5 +98,6 @@ contains
       call exit(hipError_t)
     end if
   end subroutine hipCheck
+#endif
 
 end module FGPUTensor_HIP

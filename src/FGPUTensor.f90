@@ -8,17 +8,19 @@ module FGPUTensor
 
   use iso_fortran_env
   use iso_c_binding
-
-  !#ifdef HIP
   use FGPUTensor_HIP
   use FGPUTensor_HIP_enums
-  use FGPUTensor_Utils
-  !#endif
+  use FGPUTensor_HIP_Utils
 
   implicit none
 
   integer,parameter,public :: FGPUTensor_CPU_Device_ID = -1
   integer,parameter,public :: FGPUTensor_MaxDims = 7
+#ifdef HIP
+  logical,parameter,public :: FGPUTensor_HIP_enabled = .true.
+#else
+  logical,parameter,public :: FGPUTensor_HIP_enabled = .false.
+#endif
 
   type,abstract :: tensor
 
@@ -227,7 +229,7 @@ module FGPUTensor
 
 contains
 
-  subroutine gpumalloc(gpu_ptr,size,exit_code)
+  subroutine gpumalloc(gpu_ptr,size)
   !! this is a simple wrapper around hipmalloc
   !! if HIP is available at compile time and the HIP CPP flag is defined,
   !! then this code calls hipmalloc to allocate gpu data. Otherwise,
@@ -235,14 +237,11 @@ contains
     implicit none
     type(c_ptr),intent(inout) :: gpu_ptr
     integer(c_size_t),intent(in) :: size
-    integer(kind(hipSuccess)),intent(out) :: exit_code
+    
+#ifdef HIP
+    call hipcheck(hipMalloc(gpu_ptr,size))
+#endif
 
-    !#ifdef HIP
-    exit_code = hipMalloc(gpu_ptr,size)
-    !#else
-    !exit_code = 0
-    !return
-    !#endif
   end subroutine gpumalloc
 
   subroutine init(this,dims,device_id)
@@ -279,7 +278,11 @@ contains
     class(tensor_f32_r1),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1)))
@@ -289,8 +292,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -305,7 +307,11 @@ contains
     class(tensor_f32_r2),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -316,8 +322,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -332,7 +337,11 @@ contains
     class(tensor_f32_r3),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -344,8 +353,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -360,7 +368,11 @@ contains
     class(tensor_f32_r4),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -373,8 +385,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -389,7 +400,11 @@ contains
     class(tensor_f32_r5),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -403,8 +418,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -419,7 +433,11 @@ contains
     class(tensor_f32_r6),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -434,8 +452,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -450,7 +467,11 @@ contains
     class(tensor_f32_r7),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -466,8 +487,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -482,7 +502,11 @@ contains
     class(tensor_i32_r1),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1)))
@@ -492,8 +516,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -508,7 +531,11 @@ contains
     class(tensor_i32_r2),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -519,8 +546,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -535,7 +561,11 @@ contains
     class(tensor_i32_r3),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -547,8 +577,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu)) 
         end if
       end if
     else
@@ -563,7 +592,11 @@ contains
     class(tensor_i32_r4),intent(inout) :: this
     integer,optional :: device_id
     ! Local
+#ifdef HIP
     integer(kind(hipSuccess)) :: exit_code
+#else
+    integer(int32) :: exit_code
+#endif
 
     if (this % inited) then
       if (.not. associated(this % cpu)) allocate (this % cpu(1:this % dims(1), &
@@ -576,8 +609,7 @@ contains
         this % device_id = device_id
         exit_code = init_device(device_id)
         if (exit_code == 0) then
-          call gpumalloc(this % gpu,sizeof(this % cpu),exit_code)
-          call hipcheck(exit_code)
+          call gpumalloc(this % gpu,sizeof(this % cpu))
         end if
       end if
     else
@@ -592,11 +624,11 @@ contains
     class(tensor_f32_r1),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_f32_r1
 
   subroutine free_tensor_f32_r2(this)
@@ -604,11 +636,11 @@ contains
     class(tensor_f32_r2),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_f32_r2
 
   subroutine free_tensor_f32_r3(this)
@@ -616,11 +648,11 @@ contains
     class(tensor_f32_r3),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_f32_r3
 
   subroutine free_tensor_f32_r4(this)
@@ -628,11 +660,11 @@ contains
     class(tensor_f32_r4),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_f32_r4
 
   subroutine free_tensor_f32_r5(this)
@@ -640,11 +672,11 @@ contains
     class(tensor_f32_r5),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_f32_r5
 
   subroutine free_tensor_f32_r6(this)
@@ -652,11 +684,11 @@ contains
     class(tensor_f32_r6),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_f32_r6
 
   subroutine free_tensor_f32_r7(this)
@@ -664,11 +696,11 @@ contains
     class(tensor_f32_r7),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_f32_r7
 
   subroutine free_tensor_i32_r1(this)
@@ -676,11 +708,11 @@ contains
     class(tensor_i32_r1),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_i32_r1
 
   subroutine free_tensor_i32_r2(this)
@@ -688,11 +720,11 @@ contains
     class(tensor_i32_r2),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_i32_r2
 
   subroutine free_tensor_i32_r3(this)
@@ -700,11 +732,11 @@ contains
     class(tensor_i32_r3),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_i32_r3
 
   subroutine free_tensor_i32_r4(this)
@@ -712,296 +744,297 @@ contains
     class(tensor_i32_r4),intent(inout) :: this
 
     if (associated(this % cpu)) deallocate (this % cpu)
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipfree(this % gpu))
     end if
-
+#endif
   end subroutine free_tensor_i32_r4
 
   subroutine updatecpu_tensor_f32_r1(this)
     implicit none
     class(tensor_f32_r1),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_f32_r1
 
   subroutine updatecpu_tensor_f32_r2(this)
     implicit none
     class(tensor_f32_r2),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_f32_r2
 
   subroutine updatecpu_tensor_f32_r3(this)
     implicit none
     class(tensor_f32_r3),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_f32_r3
 
   subroutine updatecpu_tensor_f32_r4(this)
     implicit none
     class(tensor_f32_r4),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_f32_r4
 
   subroutine updatecpu_tensor_f32_r5(this)
     implicit none
     class(tensor_f32_r5),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_f32_r5
 
   subroutine updatecpu_tensor_f32_r6(this)
     implicit none
     class(tensor_f32_r6),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_f32_r6
 
   subroutine updatecpu_tensor_f32_r7(this)
     implicit none
     class(tensor_f32_r7),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_f32_r7
 
   subroutine updatecpu_tensor_i32_r1(this)
     implicit none
     class(tensor_i32_r1),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_i32_r1
 
   subroutine updatecpu_tensor_i32_r2(this)
     implicit none
     class(tensor_i32_r2),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_i32_r2
 
   subroutine updatecpu_tensor_i32_r3(this)
     implicit none
     class(tensor_i32_r3),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_i32_r3
 
   subroutine updatecpu_tensor_i32_r4(this)
     implicit none
     class(tensor_i32_r4),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(c_loc(this % cpu), &
                               this % gpu, &
                               sizeof(this % cpu), &
                               hipMemcpyDeviceToHost))
     end if
-
+#endif
   end subroutine updatecpu_tensor_i32_r4
 
   subroutine updategpu_tensor_f32_r1(this)
     implicit none
     class(tensor_f32_r1),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_f32_r1
 
   subroutine updategpu_tensor_f32_r2(this)
     implicit none
     class(tensor_f32_r2),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_f32_r2
 
   subroutine updategpu_tensor_f32_r3(this)
     implicit none
     class(tensor_f32_r3),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_f32_r3
 
   subroutine updategpu_tensor_f32_r4(this)
     implicit none
     class(tensor_f32_r4),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_f32_r4
 
   subroutine updategpu_tensor_f32_r5(this)
     implicit none
     class(tensor_f32_r5),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_f32_r5
 
   subroutine updategpu_tensor_f32_r6(this)
     implicit none
     class(tensor_f32_r6),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_f32_r6
 
   subroutine updategpu_tensor_f32_r7(this)
     implicit none
     class(tensor_f32_r7),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_f32_r7
 
   subroutine updategpu_tensor_i32_r1(this)
     implicit none
     class(tensor_i32_r1),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_i32_r1
 
   subroutine updategpu_tensor_i32_r2(this)
     implicit none
     class(tensor_i32_r2),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_i32_r2
 
   subroutine updategpu_tensor_i32_r3(this)
     implicit none
     class(tensor_i32_r3),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
-
+#endif
   end subroutine updategpu_tensor_i32_r3
 
   subroutine updategpu_tensor_i32_r4(this)
     implicit none
     class(tensor_i32_r4),intent(inout) :: this
-
+#ifdef HIP
     if (this % device_id >= 0) then
       call hipCheck(hipMemcpy(this % gpu, &
                               c_loc(this % cpu), &
                               sizeof(this % cpu), &
                               hipMemcpyHostToDevice))
     end if
+#endif
 
   end subroutine updategpu_tensor_i32_r4
 
